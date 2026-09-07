@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36657a00ade1edf4d8adc7663e205457, type: 3}
+  m_Name: ColorSO
+  m_EditorClassIdentifier: Assembly-CSharp::ColorsSO
+  texMask: {fileID: 0}
+  uC:
+  - colorName: Red
+    minHue: 0
+    maxHue: 18
+    maskLayer: 0
+  - colorName: Red
+    minHue: 350
+    maxHue: 360
+    maskLayer: 0
+  - colorName: Orange
+    minHue: 18
+    maxHue: 46
+    maskLayer: 0
+  - colorName: Yellow
+    minHue: 46
+    maxHue: 68
+    maskLayer: 0
+  - colorName: Green
+    minHue: 68
+    maxHue: 160
+    maskLayer: 0
+  - colorName: Blue
+    minHue: 160
+    maxHue: 255
+    maskLayer: 0
+  - colorName: Magenta
+    minHue: 300
+    maxHue: 350
+    maskLayer: 0
+  - colorName: VAL
+    minHue: 0
+    maxHue: 360
+    maskLayer: 1
+  - colorName: SAT
+    minHue: 0
+    maxHue: 360
+    maskLayer: 2
+  - colorName: Violet
+    minHue: 255
+    maxHue: 300
+    maskLayer: 0
