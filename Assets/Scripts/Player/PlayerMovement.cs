@@ -86,4 +86,13 @@ public class PlayerMovement : MonoBehaviour
 
         rb.AddForce(direction.normalized * usageSpeed * 10f, ForceMode.Force);
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.transform.tag == "death")
+        {
+            Debug.Log("Deathplane hit, teleport back");
+            this.transform.position = new Vector3(0, 10, 0);
+        }
+    }
 }

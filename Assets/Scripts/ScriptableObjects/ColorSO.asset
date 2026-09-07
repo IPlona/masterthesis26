@@ -19,38 +19,6 @@ MonoBehaviour:
     maxHue: 18
     maskLayer: 0
   - colorName: Red
-    minHue: 350
+    minHue: 346
     maxHue: 360
-    maskLayer: 0
-  - colorName: Orange
-    minHue: 18
-    maxHue: 46
-    maskLayer: 0
-  - colorName: Yellow
-    minHue: 46
-    maxHue: 68
-    maskLayer: 0
-  - colorName: Green
-    minHue: 68
-    maxHue: 160
-    maskLayer: 0
-  - colorName: Blue
-    minHue: 160
-    maxHue: 255
-    maskLayer: 0
-  - colorName: Magenta
-    minHue: 300
-    maxHue: 350
-    maskLayer: 0
-  - colorName: VAL
-    minHue: 0
-    maxHue: 360
-    maskLayer: 1
-  - colorName: SAT
-    minHue: 0
-    maxHue: 360
-    maskLayer: 2
-  - colorName: Violet
-    minHue: 255
-    maxHue: 300
     maskLayer: 0

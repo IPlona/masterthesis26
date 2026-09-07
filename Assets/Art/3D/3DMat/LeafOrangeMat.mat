@@ -116,12 +116,13 @@ Material:
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
+    - _Threshold: 0.5
     - _UVSec: 0
     - _WorkflowMode: 1
     - _XRMotionVectorsPass: 1
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.756344, g: 0.56624514, b: 0.2781448, a: 1}
+    - _BaseColor: {r: 0.75686276, g: 0.57195467, b: 0.27843136, a: 1}
     - _Color: {r: 0.75634396, g: 0.5662451, b: 0.27814478, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}

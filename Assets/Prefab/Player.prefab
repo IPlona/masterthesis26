@@ -66,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6b3a767adec88b04b82911c40f61b137, type: 2}
+  - {fileID: 2100000, guid: ab959e30e466ee84986d02545dc4e097, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -134,7 +134,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1991914189008939503}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 64c775bbfb626d642ac700f645f7549b, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -213,7 +213,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   canMove: 1
   sens: 500
-  speed: 4
+  speed: 3.5
   sprintSpeed: 0
   neck: {fileID: 5890309469559143736}
   xRotClamp: {x: -90, y: 90}

@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Unity.Android.Gradle;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 [System.Serializable]

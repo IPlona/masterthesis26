@@ -23,13 +23,13 @@ public class ColorManager : MonoBehaviour
         //DEBUGGER
         if (Input.GetKeyDown("1")) {
             //Red
-            UnlockedColor[] reds = { new UnlockedColor(0, 18, 0, "Red"), new UnlockedColor(350, 360, 0, "Red") };
+            UnlockedColor[] reds = { new UnlockedColor(0, 18, 0, "Red"), new UnlockedColor(346, 360, 0, "Red") };
             addColor(reds);
         }
         if (Input.GetKeyDown("2"))
         {
             //Orange
-            addColor(new UnlockedColor(18, 46, 0, "Orange"));
+            addColor(new UnlockedColor(18, 45, 0, "Orange"));
         }
         if (Input.GetKeyDown("3"))
         {
@@ -39,29 +39,28 @@ public class ColorManager : MonoBehaviour
         if (Input.GetKeyDown("4"))
         {
             //Green
-            addColor(new UnlockedColor(68, 160, 0, "Green"));
+            addColor(new UnlockedColor(69, 100, 0, "Lime"));
+            addColor(new UnlockedColor(101, 135, 0, "Green"));
         }
         if (Input.GetKeyDown("5"))
         {
-            //Blue, technically blue should be in 2, Cyan and Blue... Well.
-            addColor(new UnlockedColor(160, 255, 0, "Blue"));
+            addColor(new UnlockedColor(136, 170, 0, "Turqois"));
+            addColor(new UnlockedColor(171, 205, 0, "Cyan"));
         }
         if (Input.GetKeyDown("6"))
         {
-            //Violet/Purple
-            addColor(new UnlockedColor(255, 300, 0, "Violet"));
+            //Blue
+            addColor(new UnlockedColor(206, 252, 0, "Blue"));
         }
         if (Input.GetKeyDown("7"))
         {
-            //Magenta
-            addColor(new UnlockedColor(300, 350, 0, "Magenta"));
+            addColor(new UnlockedColor(253, 290, 0, "Violet"));
+            addColor(new UnlockedColor(291, 345, 0, "Magenta"));
         }
         if (Input.GetKeyDown("8"))
         {
-            //Magenta
-            //addColor(new UnlockedColor(0, 360, 1, "Lot of hue"));
-            //addColor(new UnlockedColor(0, 360, 2, "Lot of hue"));
-            ColorsSO.refreshMask("_SpectriMask");
+            addColor(new UnlockedColor(0, 360, 1, "Lot of hue"));
+            addColor(new UnlockedColor(0, 360, 2, "Lot of hue"));
         }
 
 
@@ -69,6 +68,7 @@ public class ColorManager : MonoBehaviour
         {
             //Remove dublicates
             filterDuplicates();
+            ColorsSO.refreshMask("_SpectriMask");
         }
         if (Input.GetKeyDown("0"))
         {

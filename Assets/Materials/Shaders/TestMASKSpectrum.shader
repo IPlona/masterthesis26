@@ -177,10 +177,11 @@ Shader "Custom/TestMASKSpectrum"
                 //For Saturation and Value masks, we need to convert the hueCord back to RGB (And rename the variable to colorHSV)
                 //with values changed with the two masks.
                 float vMask = SAMPLE_TEXTURE2D(_SpectriMask, sampler_SpectriMask, float2(colorHSV.r, 0.5)).r;
-                colorHSV.b = (colorHSV.b + vMask) - (0.4 * vMask);  //b == value
+                //colorHSV.b = (colorHSV.b + vMask) - (0.4 * vMask);  //b == value
+                colorHSV.b = lerp(colorHSV.b, 1.0f, step(0.01f, vMask));
 
                 float sMask = SAMPLE_TEXTURE2D(_SpectriMask, sampler_SpectriMask, float2(colorHSV.r, 1.0)).r;
-                float sMaskConditional = lerp(0, lerp(colorHSV.g, 0.55f, step(0.5f, sMask)), step(0.01f, colorHSV.g));
+                float sMaskConditional = lerp(0, lerp(colorHSV.g, 0.45f, step(0.5f, sMask)), step(0.01f, colorHSV.g));
                 colorHSV.g = sMaskConditional;  //g == saturation
 
                 float3 newColor = sRGB2linear_IT(getRGB(colorHSV));
