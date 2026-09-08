@@ -6,6 +6,7 @@ Shader "Custom/TestMASKSpectrum"
         [MainTexture] _BaseMap("Base Map", 2D) = "white" {}
 
         [Treshold] _Threshold("Shade Threshold", Range(0,1)) = 0.5
+        [FogColor] _FogColor("Fog Color", Color) = (0, 0, 0, 1)
     }
 
     SubShader
@@ -67,6 +68,7 @@ Shader "Custom/TestMASKSpectrum"
                 half4 _BaseColor;
                 float4 _BaseMap_ST;
                 float _Threshold;
+                half4 _FogColor;
 
                 Texture2D _SpectriMask;
 
@@ -187,7 +189,7 @@ Shader "Custom/TestMASKSpectrum"
                 float3 newColor = sRGB2linear_IT(getRGB(colorHSV));
 
                 color.rgb = saturate(newColor.rgb + mask * 2.5);
-
+                
                 //Toon pass - https://medium.com/@chitranshnishad27/toon-shaders-in-unity-from-shader-graph-to-custom-hlsl-08252b2d64a2
                 float3 normal = normalize(IN.normalWS);
                 float3 lightDir = normalize(_MainLightPosition.xyz);
@@ -196,11 +198,30 @@ Shader "Custom/TestMASKSpectrum"
                 Light mainLight = GetMainLight(shadow);
                 half mainAtten = mainLight.shadowAttenuation;
 
-                float NdotL = dot(normal, lightDir) * mainAtten;
+                float NdotL = dot(normal, lightDir);
+                float NdotMA = NdotL * mainAtten;
                 
-                float shadeStep = step(_Threshold, NdotL);
-                float4 colorToon = lerp(color * 0.5f, color, shadeStep);
+                //float shadeStep = step(_Threshold, NdotMA);
+                //  Instead of hard cut we give it a bit softness
+                float shadeStep = saturate(lerp(_Threshold, NdotMA, 10));
 
+                //This is a fog effect //TODO: TURNED OFF CUZ ANNOYING IN EDIT MODE TURN BACK ON LATER
+                //float fogShadow = saturate(pow(lerp(0, 1, IN.positionHCS.z * 170), -1) * 0.5f);
+                //This is all calculated together
+                float shadeFunk = saturate(lerp(lerp(0.2f, 0.0f, NdotL * 2), 1, shadeStep));// + fogShadow);
+                
+                //NOTE!!! You can calc new colors too!!! 
+                //Shadow color
+                half4 newShadowColor = color;
+                float hueShift = saturate((lerp(0.2f, 0.0f, NdotL * 2) * 0.2f));
+                colorHSV.r = lerp(colorHSV.r - hueShift, colorHSV.r + hueShift, step(0.35f, colorHSV.r));
+                colorHSV.b = saturate(colorHSV.b * 0.8f);
+                colorHSV.g = saturate(colorHSV.g * 1.5f);
+                newShadowColor.rgb = saturate(sRGB2linear_IT(getRGB(colorHSV)).rgb + mask * 2.5);
+
+
+                float4 colorToon = lerp(newShadowColor * 0.7f, color, shadeFunk);
+                
                 return colorToon;
             }
             ENDHLSL

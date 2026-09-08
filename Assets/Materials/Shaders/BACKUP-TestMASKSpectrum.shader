@@ -1,4 +1,4 @@
-Shader "Custom/BACKUPTestMASKSpectrum"
+Shader "Custom/BACKUP-MASKSpectrum"
 {
     Properties
     {
