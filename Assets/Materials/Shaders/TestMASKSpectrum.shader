@@ -14,8 +14,9 @@ Shader "Custom/TestMASKSpectrum"
         Tags {
                 "RenderType" = "Opaque"
                 "RenderPipeline" = "UniversalPipeline"
-                //"LightMode" = "ForwardBase"
+                "LightMode" = "ForwardBase"
                 //"PassFlags" = "OnlyDirectional"
+                "Queue" = "Geometry"
         }
         //Level of detail??
         //LOD 200
@@ -23,6 +24,8 @@ Shader "Custom/TestMASKSpectrum"
         Pass
         {
             Name "Color Manipulation"
+
+            Cull Off
 
             //May not be nessecary
             Tags {"LightMode" = "UniversalForward"}
@@ -189,7 +192,7 @@ Shader "Custom/TestMASKSpectrum"
                 float3 newColor = sRGB2linear_IT(getRGB(colorHSV));
 
                 color.rgb = saturate(newColor.rgb + mask * 2.5);
-                
+
                 //Toon pass - https://medium.com/@chitranshnishad27/toon-shaders-in-unity-from-shader-graph-to-custom-hlsl-08252b2d64a2
                 float3 normal = normalize(IN.normalWS);
                 float3 lightDir = normalize(_MainLightPosition.xyz);
@@ -221,7 +224,8 @@ Shader "Custom/TestMASKSpectrum"
 
 
                 float4 colorToon = lerp(newShadowColor * 0.7f, color, shadeFunk);
-                
+                colorToon.a = color.a;
+
                 return colorToon;
             }
             ENDHLSL
@@ -259,7 +263,7 @@ Shader "Custom/TestMASKSpectrum"
             float4 GetShadowPositionHClip(Attributes IN) {
                 float3 positionWS = TransformObjectToWorld(IN.positionOS);
                 float3 normalWS = TransformObjectToWorldNormal(IN.normalLS);
-                float4 positionCS = TransformWorldToHClip(ApplyShadowBias(positionWS, normalWS, _LightDirection));
+                float4 positionCS = TransformWorldToHClip(ApplyShadowBias(positionWS, normalWS, _LightDirection ));
                 positionCS = ApplyShadowClamping(positionCS);
                 return positionCS;
             }
