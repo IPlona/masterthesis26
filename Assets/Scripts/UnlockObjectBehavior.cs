@@ -18,7 +18,7 @@ public class UnlockObjectBehavior : MonoBehaviour
         //+ In order for the meter to fill when looked at, one of the colors listed here needs to be unlocked.
     [SerializeField] UnlockedColor[] ownColors;
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (canCheck)
         {   
@@ -62,4 +62,17 @@ public class UnlockObjectBehavior : MonoBehaviour
         return new UnlockedColor[0];
     }
 
+
+    public bool getCanFill()
+    {
+        return canFill;
+    }
+    public float getMeter()
+    {
+        return meter;
+    }
+    public float getMaxMeter()
+    {
+        return maxMeter;
+    }
 }

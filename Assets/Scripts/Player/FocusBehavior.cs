@@ -20,24 +20,36 @@ public class FocusBehavior : MonoBehaviour
             //TODO: Implement with animator the smooth transition etc.
             if (!inFocus)
             {
-                Debug.Log("Focus M.");
-                cam.fieldOfView = 30;
-
-                inFocus = !inFocus;
-
+                intoFocus();
             } else
             {
-                Debug.Log("Goodbye Caroline.");
-                cam.fieldOfView = 60;
-
-                inFocus = !inFocus;
+                outofFocus();
             }
         }
 
-        if (inFocus && cam && colorManager && canFocus)
+        if (inFocus && anim && colorManager && canFocus)
         {
             ShootFocus();
         }
+    }
+
+    private void intoFocus()
+    {
+        Debug.Log("Focus M.");
+        //cam.fieldOfView = 30;
+        anim.SetTrigger("focus");
+
+        inFocus = !inFocus;
+    }
+    private void outofFocus()
+    {
+        Debug.Log("Goodbye Caroline.");
+        //cam.fieldOfView = 60;
+        anim.SetTrigger("outfocus");
+        anim.SetBool("focusing", false);
+        anim.SetFloat("depth", 0);
+
+        inFocus = !inFocus;
     }
 
     /// <summary>
@@ -52,14 +64,27 @@ public class FocusBehavior : MonoBehaviour
                 UnlockedColor[] list;
 
                 //Debug.Log(hit.transform.name);
+                anim.SetBool("focusing", uC.getCanFill());
                 list = uC.fillTheMeter(colorManager);
+
+                anim.SetFloat("depth", uC.getMeter() / uC.getMaxMeter());
+                anim.SetFloat("startDepth", ((1.0f / Time.deltaTime) / uC.getMaxMeter()) );
 
                 if (list.Length > 0)
                 {
                     Debug.Log("We got colors!");
                     colorManager.addColor(list);
+                    outofFocus();
                 }
             }
+            else
+            {
+                anim.SetBool("focusing", false);
+            }
+        }
+        else
+        {
+            anim.SetBool("focusing", false);
         }
     }
 }

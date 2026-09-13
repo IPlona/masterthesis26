@@ -276,7 +276,7 @@ Shader "Custom/TestMASKTransparent"
             float4 GetShadowPositionHClip(Attributes IN) {
                 float3 positionWS = TransformObjectToWorld(IN.positionOS);
                 float3 normalWS = TransformObjectToWorldNormal(IN.normalLS);
-                float4 positionCS = TransformWorldToHClip(ApplyShadowBias(positionWS, normalWS, _LightDirection ));
+                float4 positionCS = TransformWorldToHClip(ApplyShadowBias(positionWS, normalWS, _LightDirection));
                 positionCS = ApplyShadowClamping(positionCS);
                 return positionCS;
             }
@@ -284,8 +284,8 @@ Shader "Custom/TestMASKTransparent"
             Varyings vert(Attributes IN)
             {
                 Varyings OUT;
-                OUT.positionHCS = GetShadowPositionHClip(IN);
                 OUT.uv = (IN.uv * _BaseMap_ST.xy) + _BaseMap_ST.zw;
+                OUT.positionHCS = GetShadowPositionHClip(IN);
 
                 return OUT;
             }
