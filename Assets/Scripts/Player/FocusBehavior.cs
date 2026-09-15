@@ -41,11 +41,11 @@ public class FocusBehavior : MonoBehaviour
 
         inFocus = !inFocus;
     }
-    private void outofFocus()
+    private void outofFocus(string whichTriggerExit = "outfocus")
     {
         Debug.Log("Goodbye Caroline.");
         //cam.fieldOfView = 60;
-        anim.SetTrigger("outfocus");
+        anim.SetTrigger(whichTriggerExit);
         anim.SetBool("focusing", false);
         anim.SetFloat("depth", 0);
 
@@ -74,7 +74,7 @@ public class FocusBehavior : MonoBehaviour
                 {
                     Debug.Log("We got colors!");
                     colorManager.addColor(list);
-                    outofFocus();
+                    outofFocus("colorUnlocked");
                 }
             }
             else
@@ -86,5 +86,15 @@ public class FocusBehavior : MonoBehaviour
         {
             anim.SetBool("focusing", false);
         }
+    }
+
+    //These are mostly for the animator calls
+    public void canFocusTrue()
+    {
+        canFocus = true;
+    }
+    public void canFocusFalse()
+    {
+        canFocus = false;
     }
 }
