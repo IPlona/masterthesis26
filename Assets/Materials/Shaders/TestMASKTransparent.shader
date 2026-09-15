@@ -9,6 +9,11 @@ Shader "Custom/TestMASKTransparent"
         [FogColor] _FogColor("Fog Color", Color) = (0, 0, 0, 1)
 
         [Alpha cutoff] _AlphaThreshold("Alpha Cutoff", Range(0,1)) = 0.5
+
+        [Wave speed] _WaveSpeed("Wave speed", float) = 10
+        [Wave amplitute] _WaveAmp("Wave amplitute", float) = 1
+
+        [Morhphin Attributes] _Morp("Morhinp Attributes", vector) = (5, 10, 20, 1)
     }
 
     SubShader
@@ -48,7 +53,8 @@ Shader "Custom/TestMASKTransparent"
             
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-            
+
+
             //My hlsl
             #include "Assets/Materials/Shaders/ColorManipulationCalculations.hlsl"
             
@@ -64,8 +70,8 @@ Shader "Custom/TestMASKTransparent"
             struct Varyings
             {
                 float4 positionHCS  : SV_POSITION;
-                float3 normalWS     : TEXCOORD0;     //WS = WorldSpace
-                float2 uv           : TEXCOORD1;
+                float3 normalWS     : TEXCOORD1;     //WS = WorldSpace
+                float2 uv           : TEXCOORD0;
                 float3 positionWS   : TEXCOORD2;
             };
 
@@ -83,6 +89,10 @@ Shader "Custom/TestMASKTransparent"
 
                 Texture2D _SpectriMask;
 
+                float _WaveSpeed;
+                float _WaveAmp;
+                float4 _Morp;
+
             CBUFFER_END
 
             Varyings vert(Attributes IN)
@@ -95,6 +105,18 @@ Shader "Custom/TestMASKTransparent"
                 //
                 OUT.uv = TRANSFORM_TEX(IN.uv, _BaseMap);
 
+                //Wave anim
+                
+                    // Just your regular sin
+                //OUT.positionHCS.y += sin(IN.positionOS.y + _Time * _WaveSpeed) * IN.uv.y * _WaveAmp;
+                    // Nlerp
+                float wave = normalize(lerp(-1, 1, sin(_Time * _WaveSpeed) * 0.5f)) + 0.25f + (_WaveAmp * 0.1f);
+                OUT.positionHCS.y += wave * IN.uv.y * _WaveAmp;
+
+                float morpSin = sin(IN.uv.x * _Morp.x + _Time * _Morp.y) * _Morp.z;
+                OUT.positionHCS.x -= morpSin * IN.uv.y;
+                OUT.positionHCS.y += morpSin * IN.uv.y;
+                
                 return OUT;
             }
 
@@ -160,62 +182,6 @@ Shader "Custom/TestMASKTransparent"
             ENDHLSL
         }
 
-
-        Pass{
-            Name "Vert displacement"
-
-            Cull Off
-
-            //This saves TINY performance apparently. It skips the whole color idea
-            //ColorMask 0
-
-            HLSLPROGRAM
-
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
-
-            struct Attributes
-            {
-                float4 positionOS : POSITION;
-                float3 normalLS : NORMAL;   //LS = LocalSpace
-                float2 uv : TEXCOORD0;
-            };
-
-            struct Varyings
-            {
-                float4 positionHCS : SV_POSITION;
-                float2 uv : TEXCOORD0;
-            };
-
-            TEXTURE2D(_BaseMap);
-            SAMPLER(sampler_BaseMap);
-            half4 _BaseColor;
-            float4 _BaseMap_ST;
-            half _AlphaThreshold;
-
-            Varyings vert(Attributes IN)
-            {
-                Varyings OUT;
-                OUT.uv = (IN.uv * _BaseMap_ST.xy) + _BaseMap_ST.zw;
-                OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
-
-                //OUT.positionHCS.y += OUT.uv.x * sin(OUT.uv.x * 5) * sin(_Time * 50);
-                //OUT.positionHCS.x += sin(OUT.uv.x * _SinTime);
-
-                return OUT;
-            }
-
-            half4 frag(Varyings IN) : SV_Target
-            {
-                return 0;
-            }
-            ENDHLSL
-
-        }
-
         Pass{
             Name "ShadowCaster"
             Tags {"LightMode" = "ShadowCaster"}
@@ -223,7 +189,7 @@ Shader "Custom/TestMASKTransparent"
             Cull Off
 
             //This saves TINY performance apparently. It skips the whole color idea
-            //ColorMask 0
+            ColorMask 0
             
             HLSLPROGRAM
 
@@ -278,7 +244,7 @@ Shader "Custom/TestMASKTransparent"
                 if (a < _AlphaThreshold) {
                     discard;
                 }
-                return 0;
+                return a;
             }
             ENDHLSL
             

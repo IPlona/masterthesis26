@@ -7,6 +7,8 @@ Shader "Custom/TestMASKSpectrum"
 
         [Treshold] _Threshold("Shade Threshold", Range(0,1)) = 0.5
         [FogColor] _FogColor("Fog Color", Color) = (0, 0, 0, 1)
+
+        
     }
 
     SubShader
@@ -36,7 +38,7 @@ Shader "Custom/TestMASKSpectrum"
             #pragma vertex vert
             #pragma fragment frag
             #pragma shader_feature _FORWARD_PLUS
-            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            //#pragma multi_compile_fragment _ _SHADOWS_SOFT
 
             //Shadows - URP
             #pragma shader_feature_fragment _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
@@ -63,8 +65,8 @@ Shader "Custom/TestMASKSpectrum"
             struct Varyings
             {
                 float4 positionHCS  : SV_POSITION;
-                float3 normalWS     : TEXCOORD0;     //WS = WorldSpace
-                float2 uv           : TEXCOORD1;
+                float3 normalWS     : TEXCOORD1;     //WS = WorldSpace
+                float2 uv           : TEXCOORD0;
                 float3 positionWS   : TEXCOORD2;
                 //float4 tes          : TEXCOORD3;
             };
