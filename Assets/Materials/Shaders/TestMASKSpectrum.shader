@@ -8,7 +8,13 @@ Shader "Custom/TestMASKSpectrum"
         [Treshold] _Threshold("Shade Threshold", Range(0,1)) = 0.5
         [FogColor] _FogColor("Fog Color", Color) = (0, 0, 0, 1)
 
-        
+        [Space]
+        [Wind speed] _WindSpeed("Wind speed", float) = 0
+        [Wind amplitute] _WindAmp("Wind amplitute", float) = 0
+        [Wind Uniformity] _WindUni("Wind Uniformity", float) = 0
+        [UV Anchor displacement] _UVAnchorDis("UV Anchor displacement", float) = 0
+
+        [Wave Attributes] _Wave("Wave Attributes", vector) = (0, 0, 0, 1)
     }
 
     SubShader
@@ -49,6 +55,7 @@ Shader "Custom/TestMASKSpectrum"
 
             //My hlsl
             #include "Assets/Materials/Shaders/ColorManipulationCalculations.hlsl"
+            #include "Assets/Materials/Shaders/WindEffects.hlsl"
 
             //Look into this
             //#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Shadow/ShadowSamplingTent.hlsl"
@@ -85,6 +92,13 @@ Shader "Custom/TestMASKSpectrum"
 
                 Texture2D _SpectriMask;
 
+
+                float _WindSpeed;
+                float _WindAmp;
+                float _WindUni;
+                float _UVAnchorDis;
+                float4 _Wave;
+
             CBUFFER_END
 
             Varyings vert(Attributes IN)
@@ -97,6 +111,12 @@ Shader "Custom/TestMASKSpectrum"
                 //OUT.tes = IN.positionOS;
                 //
                 OUT.uv = TRANSFORM_TEX(IN.uv, _BaseMap);
+
+                //Wave anim
+                OUT.positionHCS.y += WindWave(OUT.positionWS.x, IN.uv.y + _UVAnchorDis, _WindSpeed, _WindAmp, _WindUni);
+
+                OUT.positionHCS.x -= WaveEffect(IN.uv.x, IN.uv.y + _UVAnchorDis, _Wave);
+                OUT.positionHCS.y += WaveEffect(IN.uv.x, IN.uv.y + _UVAnchorDis, _Wave);
 
                 return OUT;
             }
@@ -182,22 +202,45 @@ Shader "Custom/TestMASKSpectrum"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
 
+            //My
+            #include "Assets/Materials/Shaders/WindEffects.hlsl"
+
             float3 _LightDirection; //"Populated from URP
 
             struct Attributes
             {
                 float4 positionOS : POSITION;
                 float3 normalLS : NORMAL;   //LS = LocalSpace
+                float2 uv : TEXCOORD0;
             };
 
             struct Varyings
             {
                 float4 positionHCS : SV_POSITION;
+                float2 uv : TEXCOORD0;
             };
+
+            TEXTURE2D(_BaseMap);
+            SAMPLER(sampler_BaseMap);
+            half4 _BaseColor;
+            float4 _BaseMap_ST;
+            half _AlphaThreshold;
+
+            float _WindSpeed;
+            float _WindAmp;
+            float _WindUni;
+            float _UVAnchorDis;
+            float4 _Wave;
 
             float4 GetShadowPositionHClip(Attributes IN) {
                 float3 positionWS = TransformObjectToWorld(IN.positionOS);
                 float3 normalWS = TransformObjectToWorldNormal(IN.normalLS);
+                //Shadow displacement
+                positionWS.y += WindWave(IN.positionOS.x, IN.uv.y + _UVAnchorDis, _WindSpeed, _WindAmp, _WindUni) - 0.25f;
+
+                positionWS.x -= WaveEffect(IN.uv.x, IN.uv.y + _UVAnchorDis, _Wave) * 0.5f;
+                positionWS.y += WaveEffect(IN.uv.x, IN.uv.y + _UVAnchorDis, _Wave) * 0.5f;
+                //
                 float4 positionCS = TransformWorldToHClip(ApplyShadowBias(positionWS, normalWS, _LightDirection ));
                 positionCS = ApplyShadowClamping(positionCS);
                 return positionCS;
@@ -206,6 +249,7 @@ Shader "Custom/TestMASKSpectrum"
             Varyings vert(Attributes IN)
             {
                 Varyings OUT;
+                OUT.uv = (IN.uv * _BaseMap_ST.xy) + _BaseMap_ST.zw;
                 OUT.positionHCS = GetShadowPositionHClip(IN);
                 return OUT;
             }

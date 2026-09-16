@@ -117,7 +117,11 @@ Material:
     - _SrcBlendAlpha: 1
     - _Surface: 0
     - _Threshold: 0.5
+    - _UVAnchorDis: 0
     - _UVSec: 0
+    - _WindAmp: 0.7
+    - _WindSpeed: 1
+    - _WindUni: 0.7
     - _WorkflowMode: 1
     - _XRMotionVectorsPass: 1
     - _ZWrite: 1
@@ -125,7 +129,9 @@ Material:
     - _BaseColor: {r: 0.33925402, g: 0.773005, b: 0.24562868, a: 1}
     - _Color: {r: 0.339254, g: 0.773005, b: 0.24562865, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 0}
+    - _FogColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _Wave: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &1083671322906753795

@@ -10,10 +10,12 @@ Shader "Custom/TestMASKTransparent"
 
         [Alpha cutoff] _AlphaThreshold("Alpha Cutoff", Range(0,1)) = 0.5
 
-        [Wave speed] _WaveSpeed("Wave speed", float) = 10
-        [Wave amplitute] _WaveAmp("Wave amplitute", float) = 1
+        [Wind speed] _WindSpeed("Wind speed", float) = 2
+        [Wind amplitute] _WindAmp("Wind amplitute", float) = 1
+        [Wind Uniformity] _WindUni("Wind Uniformity", float) = 1
+        [UV Anchor displacement] _UVAnchorDis("UV Anchor displacement", float) = 0
 
-        [Morhphin Attributes] _Morp("Morhinp Attributes", vector) = (5, 10, 20, 1)
+        [Wave Attributes] _Wave("Wave Attributes", vector) = (50, 10, 0.5, 1)
     }
 
     SubShader
@@ -57,6 +59,7 @@ Shader "Custom/TestMASKTransparent"
 
             //My hlsl
             #include "Assets/Materials/Shaders/ColorManipulationCalculations.hlsl"
+            #include "Assets/Materials/Shaders/WindEffects.hlsl"
             
             //Appdata
             struct Attributes
@@ -89,9 +92,11 @@ Shader "Custom/TestMASKTransparent"
 
                 Texture2D _SpectriMask;
 
-                float _WaveSpeed;
-                float _WaveAmp;
-                float4 _Morp;
+                float _WindSpeed;
+                float _WindAmp;
+                float _WindUni;
+                float _UVAnchorDis;
+                float4 _Wave;
 
             CBUFFER_END
 
@@ -105,18 +110,13 @@ Shader "Custom/TestMASKTransparent"
                 //
                 OUT.uv = TRANSFORM_TEX(IN.uv, _BaseMap);
 
-                //Wave anim
-                
-                    // Just your regular sin
-                //OUT.positionHCS.y += sin(IN.positionOS.y + _Time * _WaveSpeed) * IN.uv.y * _WaveAmp;
-                    // Nlerp
-                float wave = normalize(lerp(-1, 1, sin(_Time * _WaveSpeed) * 0.5f)) + 0.25f + (_WaveAmp * 0.1f);
-                OUT.positionHCS.y += wave * IN.uv.y * _WaveAmp;
 
-                float morpSin = sin(IN.uv.x * _Morp.x + _Time * _Morp.y) * _Morp.z;
-                OUT.positionHCS.x -= morpSin * IN.uv.y;
-                OUT.positionHCS.y += morpSin * IN.uv.y;
-                
+                //Wave anim
+                OUT.positionHCS.y += WindWave(OUT.positionWS.x, IN.uv.y + _UVAnchorDis, _WindSpeed, _WindAmp, _WindUni);
+
+                OUT.positionHCS.x -= WaveEffect(IN.uv.x, IN.uv.y, _Wave);
+                OUT.positionHCS.y += WaveEffect(IN.uv.x, IN.uv.y, _Wave);
+
                 return OUT;
             }
 
@@ -200,6 +200,9 @@ Shader "Custom/TestMASKTransparent"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
 
+            //My files
+            #include "Assets/Materials/Shaders/WindEffects.hlsl"
+
             float3 _LightDirection; //"Populated from URP
 
             struct Attributes
@@ -213,6 +216,8 @@ Shader "Custom/TestMASKTransparent"
             {
                 float4 positionHCS : SV_POSITION;
                 float2 uv : TEXCOORD0;
+                //
+                float3 positionWS   : TEXCOORD2;
             };
 
             TEXTURE2D(_BaseMap);
@@ -221,11 +226,26 @@ Shader "Custom/TestMASKTransparent"
             float4 _BaseMap_ST;
             half _AlphaThreshold;
 
+            float _WindSpeed;
+            float _WindAmp;
+            float _WindUni;
+            float _UVAnchorDis;
+            float4 _Wave;
+
+
             float4 GetShadowPositionHClip(Attributes IN) {
                 float3 positionWS = TransformObjectToWorld(IN.positionOS);
                 float3 normalWS = TransformObjectToWorldNormal(IN.normalLS);
+                //Shadow displacement
+                positionWS.y += WindWave(IN.positionOS.x, IN.uv.y + _UVAnchorDis, _WindSpeed, _WindAmp, _WindUni) - 0.25f;
+
+                positionWS.x -= WaveEffect(IN.uv.x, IN.uv.y + _UVAnchorDis, _Wave) * 0.5f;
+                positionWS.y += WaveEffect(IN.uv.x, IN.uv.y + _UVAnchorDis, _Wave) * 0.5f;
+                //
+
                 float4 positionCS = TransformWorldToHClip(ApplyShadowBias(positionWS, normalWS, _LightDirection));
                 positionCS = ApplyShadowClamping(positionCS);
+
                 return positionCS;
             }
 
@@ -234,6 +254,10 @@ Shader "Custom/TestMASKTransparent"
                 Varyings OUT;
                 OUT.uv = (IN.uv * _BaseMap_ST.xy) + _BaseMap_ST.zw;
                 OUT.positionHCS = GetShadowPositionHClip(IN);
+
+                OUT.positionWS = TransformObjectToWorld(IN.positionOS);
+
+                
 
                 return OUT;
             }
