@@ -17,21 +17,45 @@ float3 sRGB2linear_IT(float3 c) {
 float3 RGBtoHCV(in float3 RGB)
 {
     //From Ian Taylor: https://www.chilliant.com/rgb2hsvx.html
+    // Who based on work by Sam Hocevar and Emil Persson: https://web.archive.org/web/20200808153903/http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
+    //Additionally, Sam Hocevar's earlier post about this: https://web.archive.org/web/20210613072819/http://lolengine.net/blog/2013/01/13/fast-rgb-to-hsv
     float Epsilon = 1e-10;
-    // Based on work by Sam Hocevar and Emil Persson
+    
+    //According to Persson, using ternary operator is faster than the lerp-step conditional.
+    //Hocevar explains how they figured this type of conversion out of the usual RGBtoHSV conversion,
+    // here: https://web.archive.org/web/20210613072819/http://lolengine.net/blog/2013/01/13/fast-rgb-to-hsv
+    //Basically, instead of doing multiple check of min-max values he sorts RGB to go from highest to lowest
+    // which can reduce the need for min-max operations and if-else statements.
+    // Later he converst it to GLSL, which then Taylor converst to HLSL simplefying it further.
     float4 P = (RGB.g < RGB.b) ? float4(RGB.bg, -1.0, 2.0 / 3.0) : float4(RGB.gb, 0.0, -1.0 / 3.0);
     float4 Q = (RGB.r < P.x) ? float4(P.xyw, RGB.r) : float4(RGB.r, P.yzx);
+
     float C = Q.x - min(Q.w, Q.y);
+
     float H = abs((Q.w - Q.y) / (6 * C + Epsilon) + Q.z);
     return float3(H, C, Q.x);
 }
-float3 getHSV(half4 RGB) {
-    //Bsed on Ian Taylor: https://www.chilliant.com/rgb2hsvx.html
+float3 getHSV(half4 c) {
+    //Credit to Ian Taylor: https://www.chilliant.com/rgb2hsvx.html
+    // And Sam Hocevar and Emil Persson: https://web.archive.org/web/20200808153903/http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl
     float Epsilon = 1e-10;
 
-    float3 HCV = RGBtoHCV(RGB);
-    float S = HCV.y / (HCV.z + Epsilon);
-    return float3(HCV.x, S, HCV.z);
+    //I want to compine these two functions, so I will.
+    //float3 HCV = RGBtoHCV(c);
+    //First comparsion -> sorting
+    float4 P = (c.g < c.b) ? float4(c.bg, -1.0, 2.0 / 3.0) : float4(c.gb, 0.0, -1.0 / 3.0);
+    float4 q = (c.r < P.x) ? float4(P.xyw, c.r) : float4(c.r, P.yzx);
+
+    float chroma = q.x - min(q.w, q.y);
+
+    float hue = abs((q.w - q.y) / (6 * chroma + Epsilon) + q.z);
+    float Sat = chroma / (q.x + Epsilon);
+    
+    //Hue Saturation Value
+    //float3 HCV = float3(hue, chroma, q.x);
+    //float Sat = HCV.y / (HCV.z + Epsilon);
+    //return float3(HCV.x, Sat, HCV.z);
+    return float3(hue, Sat, q.x);
 }
 
 float3 getRGB(float3 c) {
